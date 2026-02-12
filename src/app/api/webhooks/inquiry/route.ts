@@ -9,8 +9,10 @@ interface InquiryBody {
   businessId: string;
   name: string;
   phone: string;
+  email?: string;
   desiredDate?: string;
   guestCount?: number;
+  budgetRange?: string;
   message: string;
   source?: string;
 }
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
 
   try {
     const body: InquiryBody = await request.json();
-    const { businessId, name, phone, desiredDate, guestCount, message, source } = body;
+    const { businessId, name, phone, email, desiredDate, guestCount, budgetRange, message, source } = body;
 
     if (!businessId || !name || !phone || !message) {
       return NextResponse.json(
@@ -101,6 +103,7 @@ export async function POST(request: Request) {
         businessId,
         name: parsed.name || name,
         phone: parsed.phone || phone,
+        email: email || null,
         source: (source as "WEBSITE" | "INSTAGRAM_DM" | "KAKAO" | "NAVER_FORM" | "PHONE" | "OTHER") || "WEBSITE",
         desiredDate: parsed.desired_date
           ? new Date(parsed.desired_date)
@@ -108,7 +111,7 @@ export async function POST(request: Request) {
             ? new Date(desiredDate)
             : null,
         guestCount: parsed.guest_count ?? guestCount ?? null,
-        budgetRange: parsed.budget_range,
+        budgetRange: parsed.budget_range || budgetRange || null,
         rawInquiry,
         parsedData: JSON.parse(JSON.stringify(parsed)),
         priority: priorityMap[parsed.urgency] || "MEDIUM",

@@ -13,8 +13,10 @@ export function InquiryForm({ businessId }: InquiryFormProps) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     desiredDate: "",
     guestCount: "",
+    budgetRange: "",
     message: "",
   });
   const [loading, setLoading] = useState(false);
@@ -37,8 +39,10 @@ export function InquiryForm({ businessId }: InquiryFormProps) {
         businessId,
         name: form.name,
         phone: form.phone,
+        email: form.email || undefined,
         desiredDate: form.desiredDate || undefined,
         guestCount: form.guestCount ? Number(form.guestCount) : undefined,
+        budgetRange: form.budgetRange || undefined,
         message: form.message,
         source: "WEBSITE",
       }),
@@ -101,6 +105,18 @@ export function InquiryForm({ businessId }: InquiryFormProps) {
           />
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-sm text-[#6B7280]">이메일</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="example@email.com"
+            value={form.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            className="h-12 rounded-xl border-gray-200 bg-white text-sm focus-visible:ring-[#A8D5BA]"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label htmlFor="desiredDate" className="text-sm text-[#6B7280]">희망 날짜</Label>
@@ -124,6 +140,18 @@ export function InquiryForm({ businessId }: InquiryFormProps) {
               className="h-12 rounded-xl border-gray-200 bg-white text-sm focus-visible:ring-[#A8D5BA]"
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="budgetRange" className="text-sm text-[#6B7280]">예산</Label>
+          <Input
+            id="budgetRange"
+            type="text"
+            placeholder="예: 3,000만원대"
+            value={form.budgetRange}
+            onChange={(e) => updateField("budgetRange", e.target.value)}
+            className="h-12 rounded-xl border-gray-200 bg-white text-sm focus-visible:ring-[#A8D5BA]"
+          />
         </div>
 
         <div className="space-y-2">

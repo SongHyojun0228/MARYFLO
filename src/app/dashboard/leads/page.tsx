@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { LeadKanban, type LeadItem } from "@/components/dashboard/LeadKanban";
+import { QuickLeadDialog } from "@/components/dashboard/QuickLeadDialog";
+import { Button } from "@/components/ui/button";
 
 export default async function LeadsPage() {
   const supabase = await createClient();
@@ -43,8 +45,17 @@ export default async function LeadsPage() {
             드래그하여 상태를 변경할 수 있습니다.
           </p>
         </div>
-        <div className="text-sm text-gray-500">
-          총 <span className="font-semibold text-[#1B1B1B]">{leads.length}</span>건
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">
+            총 <span className="font-semibold text-[#1B1B1B]">{leads.length}</span>건
+          </span>
+          <QuickLeadDialog
+            trigger={
+              <Button className="bg-[#1B1B1B] text-white hover:bg-[#2C2C2C]">
+                + 문의 등록
+              </Button>
+            }
+          />
         </div>
       </div>
 

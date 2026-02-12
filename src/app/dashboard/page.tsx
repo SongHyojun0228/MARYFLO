@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { QuickLeadDialog } from "@/components/dashboard/QuickLeadDialog";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -49,13 +51,22 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-[#1B1B1B]">
-          {business ? `${business.name}` : "대시보드"}
-        </h1>
-        <p className="mt-1 text-sm text-[#6B7280]">
-          오늘의 문의 현황을 한눈에 확인하세요.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#1B1B1B]">
+            {business ? `${business.name}` : "대시보드"}
+          </h1>
+          <p className="mt-1 text-sm text-[#6B7280]">
+            오늘의 문의 현황을 한눈에 확인하세요.
+          </p>
+        </div>
+        <QuickLeadDialog
+          trigger={
+            <Button className="w-full bg-[#1B1B1B] text-white hover:bg-[#2C2C2C] sm:w-auto">
+              + 문의 직접 등록
+            </Button>
+          }
+        />
       </div>
 
       {/* KPI Cards */}
