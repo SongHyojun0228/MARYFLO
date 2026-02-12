@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -25,14 +26,21 @@ export function LeadDetailClient({
   async function handleStatusChange(newStatus: string) {
     if (newStatus === status) return;
     setSaving(true);
-    const res = await fetch(`/api/leads/${leadId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
-    });
-    if (res.ok) {
-      setStatus(newStatus);
-      router.refresh();
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setStatus(newStatus);
+        router.refresh();
+        toast.success("상태가 변경되었습니다.");
+      } else {
+        toast.error("상태 변경에 실패했습니다.");
+      }
+    } catch {
+      toast.error("서버 오류가 발생했습니다.");
     }
     setSaving(false);
   }
@@ -40,14 +48,21 @@ export function LeadDetailClient({
   async function handleAddNote() {
     if (!note.trim()) return;
     setAddingNote(true);
-    const res = await fetch(`/api/leads/${leadId}/notes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: note }),
-    });
-    if (res.ok) {
-      setNote("");
-      router.refresh();
+    try {
+      const res = await fetch(`/api/leads/${leadId}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: note }),
+      });
+      if (res.ok) {
+        setNote("");
+        router.refresh();
+        toast.success("메모가 저장되었습니다.");
+      } else {
+        toast.error("메모 저장에 실패했습니다.");
+      }
+    } catch {
+      toast.error("서버 오류가 발생했습니다.");
     }
     setAddingNote(false);
   }

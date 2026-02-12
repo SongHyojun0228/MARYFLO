@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +47,7 @@ export default function SequencesPage() {
       const data = await res.json();
       setSequences(data.sequences || []);
     } catch {
-      console.error("Failed to fetch sequences");
+      toast.error("시퀀스 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -133,8 +134,9 @@ export default function SequencesPage() {
 
       setDialogOpen(false);
       fetchSequences();
+      toast.success(editingSequence ? "시퀀스가 수정되었습니다." : "시퀀스가 생성되었습니다.");
     } catch {
-      console.error("Failed to save sequence");
+      toast.error("시퀀스 저장에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -151,8 +153,9 @@ export default function SequencesPage() {
       setDeleteDialogOpen(false);
       setDeletingSequence(null);
       fetchSequences();
+      toast.success("시퀀스가 삭제되었습니다.");
     } catch {
-      console.error("Failed to delete sequence");
+      toast.error("시퀀스 삭제에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -170,7 +173,7 @@ export default function SequencesPage() {
       });
       fetchSequences();
     } catch {
-      console.error("Failed to toggle sequence");
+      toast.error("시퀀스 상태 변경에 실패했습니다.");
     }
   }
 

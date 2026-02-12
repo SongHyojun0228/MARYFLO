@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +47,7 @@ export default function TemplatesPage() {
       const data = await res.json();
       setTemplates(data.templates || []);
     } catch {
-      console.error("Failed to fetch templates");
+      toast.error("템플릿 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -113,8 +114,9 @@ export default function TemplatesPage() {
 
       setDialogOpen(false);
       fetchTemplates();
+      toast.success(editingTemplate ? "템플릿이 수정되었습니다." : "템플릿이 생성되었습니다.");
     } catch {
-      console.error("Failed to save template");
+      toast.error("템플릿 저장에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -131,8 +133,9 @@ export default function TemplatesPage() {
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
       fetchTemplates();
+      toast.success("템플릿이 삭제되었습니다.");
     } catch {
-      console.error("Failed to delete template");
+      toast.error("템플릿 삭제에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -150,7 +153,7 @@ export default function TemplatesPage() {
       });
       fetchTemplates();
     } catch {
-      console.error("Failed to toggle template");
+      toast.error("템플릿 상태 변경에 실패했습니다.");
     }
   }
 

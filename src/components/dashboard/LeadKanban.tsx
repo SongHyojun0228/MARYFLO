@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import {
   DndContext,
   DragOverlay,
@@ -213,19 +214,28 @@ export function LeadKanban({ initialLeads }: { initialLeads: LeadItem[] }) {
     );
 
     // Persist
-    const res = await fetch(`/api/leads/${leadId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
-    });
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-    if (!res.ok) {
-      // Revert on failure
+      if (!res.ok) {
+        setLeads((prev) =>
+          prev.map((l) =>
+            l.id === leadId ? { ...l, status: lead.status } : l
+          )
+        );
+        toast.error("상태 변경에 실패했습니다.");
+      }
+    } catch {
       setLeads((prev) =>
         prev.map((l) =>
           l.id === leadId ? { ...l, status: lead.status } : l
         )
       );
+      toast.error("서버 오류가 발생했습니다.");
     }
   }
 
