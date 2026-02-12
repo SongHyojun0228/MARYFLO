@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mariflo - 웨딩 리드 자동화",
+  title: "MARIFLO - 문의가 결혼이 되는 곳",
   description:
-    "문의부터 계약까지, 웨딩 리드 전환을 자동화하는 SaaS",
+    "3초 안에 자동 응답. 놓치는 문의 없이. 웨딩 업체의 보이지 않는 플래너.",
 };
 
 export default function RootLayout({

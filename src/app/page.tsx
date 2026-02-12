@@ -462,61 +462,284 @@ export default function LandingPage() {
   }, [phase]);
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[#FAF9F6]">
-      {/* Tile Grid */}
-      <div className="relative z-10 flex flex-col items-center">
-        <div
-          className="grid gap-1.5 sm:gap-2"
-          style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
-        >
-          {tiles.map((tile, i) => (
-            <FlipTile
-              key={i}
-              current={tile}
-              next={nextTiles[i]}
-              flipping={flipping[i]}
-            />
-          ))}
+    <main className="flex min-h-dvh flex-col overflow-hidden bg-[#FAF9F6]">
+      {/* ─── Hero Section ─────────────────────────────────────────── */}
+      <section className="relative flex min-h-dvh flex-col items-center justify-center px-4">
+        {/* Tile Grid */}
+        <div className="relative z-10 flex flex-col items-center">
+          <div
+            className="grid gap-1.5 sm:gap-2"
+            style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
+          >
+            {tiles.map((tile, i) => (
+              <FlipTile
+                key={i}
+                current={tile}
+                next={nextTiles[i]}
+                flipping={flipping[i]}
+              />
+            ))}
+          </div>
+
+          {/* Tagline + CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={showContent ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: "easeOut" as const }}
+            className="mt-10 flex flex-col items-center gap-6 text-center sm:mt-12"
+          >
+            <h1
+              className="text-2xl font-medium tracking-wide text-[#1B1B1B] sm:text-3xl"
+              style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+            >
+              문의가 결혼이 되는 곳
+            </h1>
+
+            <p className="max-w-md text-base font-light leading-relaxed text-[#6B7280] sm:text-lg">
+              3초 안에 자동 응답. 놓치는 문의 없이.
+              <br />
+              웨딩 업체의 보이지 않는 플래너.
+            </p>
+
+            <Link
+              href="/signup"
+              className="inline-block rounded-full px-10 py-4 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl sm:text-base"
+              style={{ backgroundColor: "#D4AF37" }}
+            >
+              마리플로 시작하기
+            </Link>
+
+            <Link
+              href="/login"
+              className="text-sm text-[#6B7280] transition-colors hover:text-[#1B1B1B]"
+            >
+              이미 계정이 있으신가요?
+            </Link>
+          </motion.div>
         </div>
 
-        {/* Content below the grid */}
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={showContent ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="absolute bottom-8 flex flex-col items-center gap-2 text-[#6B7280]"
+        >
+          <span className="text-xs">스크롤하여 더 알아보기</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="text-lg"
+          >
+            &#8595;
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── Pain Point: 토요일 오후의 놓친 DM ─────────────────────── */}
+      <section className="flex items-center justify-center px-6 py-24 sm:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: "easeOut" as const }}
+          className="max-w-2xl text-center"
+        >
+          <h2
+            className="mb-8 text-xl font-medium text-[#1B1B1B] sm:text-2xl"
+            style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+          >
+            토요일 오후, 예식이 한창인데
+            <br />
+            인스타 DM이 3개 들어왔습니다.
+          </h2>
+          <div className="space-y-4 text-[15px] leading-relaxed text-[#6B7280] sm:text-base">
+            <p>
+              플래너는 신부 케어 중이고, 사장님은 하객 응대 중이에요.
+              <br />
+              그 DM은 월요일에야 확인됩니다.
+            </p>
+            <p>
+              근데 그 신부님은 이미 일요일에 다른 곳과 계약했어요.
+            </p>
+          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-10 rounded-xl border border-[#E8F5E9] bg-white p-6 text-left shadow-sm sm:p-8"
+          >
+            <p className="text-sm leading-relaxed text-[#1B1B1B] sm:text-base">
+              마리플로가 있었다면, 그 3개 DM에
+              <strong className="text-[#A8D5BA]"> 3초 안에 </strong>
+              자동 응답이 나갔을 거예요.
+            </p>
+            <p className="mt-4 rounded-lg bg-[#FAF9F6] p-4 text-sm italic text-[#6B7280]">
+              &ldquo;안녕하세요! 문의 감사합니다. 담당 플래너가 오늘 중 연락드릴게요.&rdquo;
+            </p>
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 text-lg font-medium text-[#1B1B1B] sm:text-xl"
+            style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+          >
+            그 3초가, 계약 하나의 차이입니다.
+          </motion.p>
+        </motion.div>
+      </section>
+
+      {/* ─── 3 Value Props ────────────────────────────────────────── */}
+      <section className="bg-white px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-4xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="mb-16 text-center text-xl font-medium text-[#1B1B1B] sm:text-2xl"
+            style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+          >
+            마리플로가 하는 일
+          </motion.h2>
+
+          <div className="grid gap-8 sm:grid-cols-3 sm:gap-6">
+            {[
+              {
+                title: "3초의 차이",
+                desc: "문의가 들어오면 3초 안에 응답합니다. 30분 이내 응답한 업체와 계약할 확률이 3배 높습니다.",
+                accent: "#A8D5BA",
+              },
+              {
+                title: "놓치는 문의, 제로",
+                desc: "인스타 DM, 카톡, 네이버 폼, 전화 — 어디서 들어오든 하나도 안 빠지고 대시보드에 잡힙니다.",
+                accent: "#D4AF37",
+              },
+              {
+                title: "상담에만 집중하세요",
+                desc: "첫 응답, 팔로업, 리포트는 마리플로가 하고, 플래너는 공감과 클로징에 집중합니다.",
+                accent: "#A8D5BA",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                className="rounded-xl border border-[#F0F0EC] bg-[#FAF9F6] p-6 sm:p-8"
+              >
+                <div
+                  className="mb-4 h-1 w-10 rounded-full"
+                  style={{ backgroundColor: item.accent }}
+                />
+                <h3
+                  className="mb-3 text-lg font-semibold text-[#1B1B1B]"
+                  style={{ fontFamily: "'Montserrat', sans-serif" }}
+                >
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-[#6B7280]">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Comparison: 플래너 채용 vs 마리플로 ──────────────────── */}
+      <section className="px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-2xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center text-xl font-medium text-[#1B1B1B] sm:text-2xl"
+            style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+          >
+            플래너 한 명 더 뽑으면 월 250만원.
+            <br />
+            마리플로는 그 역할을 대신합니다.
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-2 gap-4"
+          >
+            {/* Left: 기존 방식 */}
+            <div className="rounded-xl border border-[#E8E4DF] bg-white p-6 text-center">
+              <p className="mb-2 text-sm text-[#6B7280]">플래너 추가 채용</p>
+              <p className="text-2xl font-semibold text-[#1B1B1B] sm:text-3xl">
+                월 250만원
+              </p>
+              <div className="mt-4 space-y-2 text-left text-xs text-[#6B7280] sm:text-sm">
+                <p>퇴근 후 응답 불가</p>
+                <p>주말 예식 중 응답 불가</p>
+                <p>퇴사 시 인수인계 필요</p>
+              </div>
+            </div>
+
+            {/* Right: 마리플로 */}
+            <div className="rounded-xl border-2 border-[#A8D5BA] bg-[#E8F5E9]/30 p-6 text-center">
+              <p className="mb-2 text-sm font-medium text-[#A8D5BA]">MARIFLO</p>
+              <p
+                className="text-2xl font-semibold sm:text-3xl"
+                style={{ color: "#D4AF37" }}
+              >
+                월 30만원
+              </p>
+              <div className="mt-4 space-y-2 text-left text-xs text-[#1B1B1B] sm:text-sm">
+                <p>24시간 자동 응답</p>
+                <p>모든 채널 문의 수집</p>
+                <p>자동 팔로업 + 리포트</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Final CTA ────────────────────────────────────────────── */}
+      <section className="flex flex-col items-center justify-center bg-white px-6 py-24 text-center sm:py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={showContent ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: "easeOut" as const }}
-          className="mt-10 flex flex-col items-center gap-5 text-center sm:mt-12"
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center gap-6"
         >
-          <p className="max-w-sm text-base font-light text-[#6B7280] sm:text-lg">
-            웨딩 문의 자동 응답부터 팔로업까지,
-            <br />
-            리드 전환의 모든 흐름을 자동화합니다.
+          <h2
+            className="text-2xl font-medium text-[#1B1B1B] sm:text-3xl"
+            style={{ fontFamily: "'Playfair Display', 'Pretendard Variable', Pretendard, sans-serif" }}
+          >
+            문의가 결혼이 되는 곳
+          </h2>
+          <p className="max-w-md text-sm leading-relaxed text-[#6B7280] sm:text-base">
+            첫 달 무료로 써보시고, 효과 없으면 바로 해지하세요.
           </p>
-
           <Link
             href="/signup"
-            className="inline-block rounded-full bg-[#1B1B1B] px-10 py-4 text-sm font-medium text-[#FAF9F6] shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl sm:text-base"
+            className="inline-block rounded-full px-10 py-4 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl sm:text-base"
+            style={{ backgroundColor: "#D4AF37" }}
           >
             마리플로 시작하기
           </Link>
-
-          <Link
-            href="/login"
-            className="text-sm text-[#6B7280] transition-colors hover:text-[#1B1B1B]"
-          >
-            이미 계정이 있으신가요?
-          </Link>
         </motion.div>
-      </div>
+      </section>
 
-      {/* Bottom tagline */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={showContent ? { opacity: 1 } : {}}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="absolute bottom-8 text-xs text-[#6B7280]"
-      >
-        Marry + Flow &mdash; 웨딩 리드 자동화 SaaS
-      </motion.footer>
+      {/* ─── Footer ───────────────────────────────────────────────── */}
+      <footer className="flex items-center justify-center bg-[#FAF9F6] py-8">
+        <p className="text-xs text-[#6B7280]">
+          &copy; 2026 MARIFLO &mdash; 문의가 결혼이 되는 곳
+        </p>
+      </footer>
     </main>
   );
 }
