@@ -20,18 +20,13 @@ export async function sendSlackNotification({
   guestCount,
   leadId,
 }: SlackNotificationParams): Promise<boolean> {
-  // Mask phone: 010-1234-5678 -> 010-****-5678
-  const maskedPhone = maskPhone(leadPhone);
-
-  // Mask name: 김철수 -> 김XX
-  const maskedName = maskName(leadName);
-
+  const formattedPhone = formatPhone(leadPhone);
   const datePart = desiredDate
     ? formatDate(desiredDate)
     : "날짜 미정";
   const guestPart = guestCount ? `${guestCount}명` : "인원 미정";
 
-  const text = `🔔 신규 문의 | ${maskedName} | ${datePart} | ${guestPart} | ${maskedPhone}`;
+  const text = `🔔 신규 문의 | ${leadName} | ${datePart} | ${guestPart} | ${formattedPhone}`;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const leadUrl = `${appUrl}/dashboard/leads/${leadId}`;
@@ -43,7 +38,7 @@ export async function sendSlackNotification({
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*🔔 신규 문의가 접수되었습니다*\n\n• 고객: ${maskedName}\n• 연락처: ${maskedPhone}\n• 희망 날짜: ${datePart}\n• 예상 인원: ${guestPart}`,
+          text: `*🔔 신규 문의가 접수되었습니다*\n\n• 고객: ${leadName}\n• 연락처: ${formattedPhone}\n• 희망 날짜: ${datePart}\n• 예상 인원: ${guestPart}`,
         },
       },
       {
@@ -83,17 +78,15 @@ export async function sendSlackNotification({
   }
 }
 
-function maskPhone(phone: string): string {
+function formatPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
-  if (digits.length >= 8) {
-    return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
   return phone;
-}
-
-function maskName(name: string): string {
-  if (name.length <= 1) return name;
-  return name[0] + "X".repeat(name.length - 1);
 }
 
 function formatDate(dateStr: string): string {
