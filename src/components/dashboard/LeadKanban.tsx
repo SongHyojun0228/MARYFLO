@@ -72,7 +72,7 @@ function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex w-72 shrink-0 flex-col rounded-2xl bg-[#FAF9F6] transition-colors sm:w-auto sm:flex-1",
+        "flex flex-1 flex-col rounded-2xl bg-[#FAF9F6] transition-colors",
         isOver && "bg-[#A8D5BA]/10"
       )}
     >
@@ -181,6 +181,7 @@ function LeadCard({ lead }: { lead: LeadItem }) {
 export function LeadKanban({ initialLeads }: { initialLeads: LeadItem[] }) {
   const [leads, setLeads] = useState<LeadItem[]>(initialLeads);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [mobileTab, setMobileTab] = useState<string>("NEW");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -239,31 +240,84 @@ export function LeadKanban({ initialLeads }: { initialLeads: LeadItem[] }) {
     }
   }
 
+  const mobileLeads = leads.filter((l) => l.status === mobileTab);
+
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex gap-3 overflow-x-auto pb-4 sm:gap-4">
-        {KANBAN_COLUMNS.map((column) => (
-          <KanbanColumn
-            key={column.id}
-            column={column}
-            leads={leads.filter((l) => l.status === column.id)}
-            activeId={activeId}
-          />
-        ))}
+    <>
+      {/* Mobile: tab-based list view */}
+      <div className="sm:hidden">
+        <div className="flex gap-1.5 overflow-x-auto pb-3">
+          {KANBAN_COLUMNS.map((col) => {
+            const count = leads.filter((l) => l.status === col.id).length;
+            return (
+              <button
+                key={col.id}
+                onClick={() => setMobileTab(col.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-colors",
+                  mobileTab === col.id
+                    ? "bg-[#1B1B1B] text-white"
+                    : "bg-white text-[#6B7280] shadow-sm"
+                )}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: mobileTab === col.id ? "#fff" : col.color }}
+                />
+                {col.label}
+                <span className={cn(
+                  "rounded-full px-1.5 py-0.5 text-[10px]",
+                  mobileTab === col.id
+                    ? "bg-white/20 text-white"
+                    : "bg-[#FAF9F6] text-[#6B7280]"
+                )}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="space-y-2">
+          {mobileLeads.map((lead) => (
+            <LeadCard key={lead.id} lead={lead} />
+          ))}
+          {mobileLeads.length === 0 && (
+            <div className="py-12 text-center text-sm text-[#6B7280]">
+              문의 고객 없음
+            </div>
+          )}
+        </div>
       </div>
 
-      <DragOverlay>
-        {activeLead ? (
-          <div className="w-72 rotate-2 opacity-90 sm:w-auto">
-            <LeadCard lead={activeLead} />
+      {/* Desktop: kanban columns with drag-and-drop */}
+      <div className="hidden sm:block">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex gap-4">
+            {KANBAN_COLUMNS.map((column) => (
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                leads={leads.filter((l) => l.status === column.id)}
+                activeId={activeId}
+              />
+            ))}
           </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+
+          <DragOverlay>
+            {activeLead ? (
+              <div className="rotate-2 opacity-90">
+                <LeadCard lead={activeLead} />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+    </>
   );
 }
