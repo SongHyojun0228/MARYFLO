@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Business {
+  id               String            @id @default(cuid())
+  name             String
+  type             BusinessType
+  phone            String
+  email            String?
+  kakaoChannelId   String?
+  solapiApiKey     String?
+  solapiSecret     String?
+  slackWebhook     String?
+  googleCalendarId String?
+  createdAt        DateTime          @default(now())
+  leads            Lead[]
+  templates        MessageTemplate[]
+  sequences        FollowupSequence[]
+  staffMembers     Staff[]
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  name       String
+  phone      String
+  role       String?
+  isActive   Boolean  @default(true)
+  leads      Lead[]
+}
+
+model Lead {
+  id                  String     @id @default(cuid())
+  businessId          String
+  business            Business   @relation(fields: [businessId], references: [id])
+  assignedStaffId     String?
+  assignedStaff       Staff?     @relation(fields: [assignedStaffId], references: [id])
+
+  // Customer info
+  name                String
+  phone               String
+  email               String?
+  source              LeadSource
+
+  // AI parsed result
+  desiredDate         DateTime?
+  guestCount          Int?
+  budgetRange         String?
+  rawInquiry          String
+  parsedData          Json?
+
+  // Status management
+  status              LeadStatus @default(NEW)
+  priority            Priority   @default(MEDIUM)
+
+  // Follow-up
+  currentSequenceStep Int        @default(0)
+  nextFollowupAt      DateTime?
+  sequenceActive      Boolean    @default(true)
+
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  activities          Activity[]
+  messages            Message[]
+}
+
+model Activity {
+  id        String       @id @default(cuid())
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id])
+  type      ActivityType
+  content   String
+  metadata  Json?
+  createdAt DateTime     @default(now())
+}
+
+model Message {
+  id          String           @id @default(cuid())
+  leadId      String
+  lead        Lead             @relation(fields: [leadId], references: [id])
+  templateId  String?
+  template    MessageTemplate? @relation(fields: [templateId], references: [id])
+  type        MessageType
+  content     String
+  status      MessageStatus    @default(PENDING)
+  sentAt      DateTime?
+  solapiMsgId String?
+  createdAt   DateTime         @default(now())
+}
+
+model MessageTemplate {
+  id         String          @id @default(cuid())
+  businessId String
+  business   Business        @relation(fields: [businessId], references: [id])
+  name       String
+  trigger    TemplateTrigger
+  content    String
+  isActive   Boolean         @default(true)
+  messages   Message[]
+}
+
+model FollowupSequence {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  name       String
+  steps      Json
+  isActive   Boolean  @default(true)
+}
+
+enum BusinessType {
+  WEDDING_HALL
+  STUDIO
+  DRESS
+  HONEYMOON
+  INVITATION
+}
+
+enum LeadSource {
+  INSTAGRAM_DM
+  KAKAO
+  NAVER_FORM
+  WEBSITE
+  PHONE
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTE_SENT
+  VISIT_SCHEDULED
+  CONTRACTED
+  LOST
+  ON_HOLD
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityType {
+  INQUIRY_RECEIVED
+  AUTO_REPLY_SENT
+  STAFF_NOTIFIED
+  CALL_MADE
+  QUOTE_SENT
+  FOLLOWUP_SENT
+  VISIT_SCHEDULED
+  STATUS_CHANGED
+  NOTE_ADDED
+}
+
+enum MessageType {
+  ALIMTALK
+  SMS
+  KAKAO
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+enum TemplateTrigger {
+  AUTO_REPLY
+  QUOTE_SENT
+  FOLLOWUP_D3
+  FOLLOWUP_D7
+  FOLLOWUP_D14
+  CONTRACT_CONGRATS
+  REVIEW_REQUEST
+  CUSTOM
+}
