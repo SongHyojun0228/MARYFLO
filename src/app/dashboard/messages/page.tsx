@@ -103,7 +103,7 @@ export default async function MessagesPage() {
                     {MESSAGE_TYPE_LABELS[msg.type] ?? msg.type}
                   </span>
                 </div>
-                <div className="col-span-2 mt-1 inline-flex items-center gap-2 sm:mt-0">
+                <div className="col-span-2 mt-1 flex items-center gap-2 sm:mt-0">
                   <span
                     className="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
                     style={getStatusStyle(msg.status)}

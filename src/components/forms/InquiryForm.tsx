@@ -117,7 +117,7 @@ export function InquiryForm({ businessId }: InquiryFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="desiredDate" className="text-sm text-[#6B7280]">희망 날짜</Label>
             <Input

@@ -16,12 +16,26 @@ interface SolapiWebhookPayload {
 }
 
 /**
- * POST /api/webhooks/solapi
+ * POST /api/webhooks/solapi?token=SOLAPI_WEBHOOK_SECRET
  *
  * Receives delivery status callbacks from Solapi.
  * Updates the corresponding Message record status.
+ *
+ * Solapi does not provide HMAC signature verification, so we use a
+ * secret token in the webhook URL query parameter for authentication.
+ * Set the webhook URL in Solapi console as:
+ *   https://your-domain.com/api/webhooks/solapi?token=YOUR_SECRET
  */
 export async function POST(request: Request) {
+  // Verify webhook secret token
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+  const webhookSecret = process.env.SOLAPI_WEBHOOK_SECRET;
+
+  if (webhookSecret && token !== webhookSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 
