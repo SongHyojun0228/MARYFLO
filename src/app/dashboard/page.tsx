@@ -15,10 +15,11 @@ export default async function DashboardPage() {
 
   const businessId = business?.id;
 
-  // Query lead stats
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  // Query lead stats (KST timezone)
+  const koreaDate = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+  const today = new Date(koreaDate + "T00:00:00+09:00");
+  const [y, m] = koreaDate.split("-").map(Number);
+  const monthStart = new Date(`${y}-${String(m).padStart(2, "0")}-01T00:00:00+09:00`);
 
   const [newToday, inConsultation, quotesSent, monthlyContracts] =
     businessId
