@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { sendSlackNotification } from "@/lib/slack";
 
 interface FollowupStep {
   delayDays: number;
   templateTrigger: string;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const {
@@ -23,16 +24,32 @@ export async function GET() {
     });
 
     if (!business) {
-      return NextResponse.json({ leads: [] });
+      return NextResponse.json({ leads: [], nextCursor: null });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const cursor = searchParams.get("cursor");
+    const limit = Math.min(parseInt(searchParams.get("limit") ?? "50"), 100);
+    const status = searchParams.get("status");
+
+    const where: Record<string, unknown> = { businessId: business.id };
+    if (status) {
+      where.status = status;
     }
 
     const leads = await prisma.lead.findMany({
-      where: { businessId: business.id },
+      where,
       orderBy: { createdAt: "desc" },
       include: { assignedStaff: true },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     });
 
-    return NextResponse.json({ leads });
+    const hasMore = leads.length > limit;
+    const result = hasMore ? leads.slice(0, limit) : leads;
+    const nextCursor = hasMore ? result[result.length - 1].id : null;
+
+    return NextResponse.json({ leads: result, nextCursor });
   } catch {
     return NextResponse.json(
       { error: "서버 오류가 발생했습니다." },
@@ -54,6 +71,7 @@ export async function POST(request: Request) {
 
     const business = await prisma.business.findFirst({
       where: { email: user.email ?? "" },
+      select: { id: true, slackWebhook: true },
     });
 
     if (!business) {
@@ -108,6 +126,21 @@ export async function POST(request: Request) {
         metadata: JSON.parse(JSON.stringify({ source, registeredBy: user.email })),
       },
     });
+
+    // Slack notification
+    try {
+      const webhookUrl = business.slackWebhook || process.env.SLACK_WEBHOOK_URL || "";
+      await sendSlackNotification({
+        webhookUrl,
+        leadName: lead.name,
+        leadPhone: lead.phone,
+        desiredDate: lead.desiredDate?.toISOString() || null,
+        guestCount: lead.guestCount,
+        leadId: lead.id,
+      });
+    } catch (slackError) {
+      console.error("Slack notification failed:", slackError);
+    }
 
     // Initialize followup sequence
     try {

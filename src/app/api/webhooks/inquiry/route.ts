@@ -213,7 +213,7 @@ export async function POST(request: Request) {
 
     // --- Step g-i: Slack notification ---
     try {
-      const webhookUrl = business.slackWebhook || "";
+      const webhookUrl = business.slackWebhook || process.env.SLACK_WEBHOOK_URL || "";
       const slackSent = await sendSlackNotification({
         webhookUrl,
         leadName: lead.name,

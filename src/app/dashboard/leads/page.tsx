@@ -17,8 +17,18 @@ export default async function LeadsPage() {
   let leads: LeadItem[] = [];
 
   if (business) {
+    // Exclude LOST/ON_HOLD leads older than 90 days
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+
     const dbLeads = await prisma.lead.findMany({
-      where: { businessId: business.id },
+      where: {
+        businessId: business.id,
+        NOT: {
+          status: { in: ["LOST", "ON_HOLD"] },
+          updatedAt: { lt: cutoff },
+        },
+      },
       orderBy: { createdAt: "desc" },
       include: { assignedStaff: { select: { name: true } } },
     });

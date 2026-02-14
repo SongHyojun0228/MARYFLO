@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { RealtimeListener } from "@/components/dashboard/RealtimeListener";
 
 export default async function DashboardLayout({
   children,
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
       <main className="flex-1 overflow-auto bg-[#FAF9F6] p-4 pb-20 sm:p-6 sm:pb-6 lg:p-8">
         {children}
       </main>
+      {business && <RealtimeListener businessId={business.id} />}
     </div>
   );
 }
